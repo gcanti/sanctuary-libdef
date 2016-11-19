@@ -37,12 +37,16 @@ declare module 'sanctuary' {
   }
 
   declare interface Apply<A> extends Functor<A> {
-    ap<B>(ff: any): Apply<B>;
+    ap<B>(ff: any): Apply<B>; // FIXME can we do better with ff?
   }
 
   declare interface Foldable<A> {
     reduce<B>(f: (b: B, a: A) => B, b: B, ...rest: Array<void>): B; // <= do not use Fn2 for f because arrays pass in more arguments (currentIndex: number, array: Array<T>)
   }
+
+  declare type Alternative = any; // FIXME can we do better?
+
+  declare type Ord = any; // FIXME can we do better?
 
   //
   // Classify
@@ -99,8 +103,8 @@ declare module 'sanctuary' {
   declare function lift<A, B>(f: Fn1<A, B>, fa: Functor<A>, ...rest: Array<void>): Functor<B>;
 
   // lift2 :: Apply f => (a -> b -> c) -> f a -> f b -> f c
-  // declare function lift2<A, B, C>(f: FixedCurried2<A, B, C>, ...rest: Array<void>): CurriedFn2<Apply<A>, Apply<B>, Apply<C>>;
-  // declare function lift2<A, B, C>(f: FixedCurried2<A, B, C>, fa: Apply<A>, ...rest: Array<void>): Fn1<Apply<B>, Apply<C>>;
+  declare function lift2<A, B, C>(f: FixedCurried2<A, B, C>, ...rest: Array<void>): CurriedFn2<Apply<A>, Apply<B>, Apply<C>>;
+  declare function lift2<A, B, C>(f: FixedCurried2<A, B, C>, fa: Apply<A>, ...rest: Array<void>): Fn1<Apply<B>, Apply<C>>;
   declare function lift2<A, B, C>(f: FixedCurried2<A, B, C>, fa: Apply<A>, fb: Apply<B>, ...rest: Array<void>): Apply<C>;
 
   // lift3 :: Apply f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
@@ -426,19 +430,19 @@ declare module 'sanctuary' {
   //
 
   // and :: Alternative a => a -> a -> a
-  declare function and<A>(a: A, ...rest: Array<void>): Fn1<A, A>;
-  declare function and<A>(a: A, a: A, ...rest: Array<void>): A;
+  declare function and<A: Alternative>(a: A, ...rest: Array<void>): Fn1<A, A>;
+  declare function and<A: Alternative>(a: A, a: A, ...rest: Array<void>): A;
 
   // or :: Alternative a => a -> a -> a
-  declare function or<A>(a: A, ...rest: Array<void>): Fn1<A, A>;
-  declare function or<A>(a: A, a: A, ...rest: Array<void>): A;
+  declare function or<A: Alternative>(a: A, ...rest: Array<void>): Fn1<A, A>;
+  declare function or<A: Alternative>(a: A, a: A, ...rest: Array<void>): A;
 
   // xor :: (Alternative a, Monoid a) => a -> a -> a
-  declare function xor<A>(a: A, ...rest: Array<void>): Fn1<A, A>;
-  declare function xor<A>(a: A, a: A, ...rest: Array<void>): A;
+  declare function xor<A: Alternative>(a: A, ...rest: Array<void>): Fn1<A, A>;
+  declare function xor<A: Alternative>(a: A, a: A, ...rest: Array<void>): A;
 
   //
-  // Alternative
+  // Logic
   //
 
   // not :: Boolean -> Boolean
@@ -616,12 +620,12 @@ declare module 'sanctuary' {
   declare function div(a: number, b: number, ...rest: Array<void>): number;
 
   // min :: Ord a => a -> a -> a
-  declare function min<A>(a: A, ...rest: Array<void>): Fn1<A, A>;
-  declare function min<A>(a: A, b: A, ...rest: Array<void>): A;
+  declare function min<A: Ord>(a: A, ...rest: Array<void>): Fn1<A, A>;
+  declare function min<A: Ord>(a: A, b: A, ...rest: Array<void>): A;
 
   // max :: Ord a => a -> a -> a
-  declare function max<A>(a: A, ...rest: Array<void>): Fn1<A, A>;
-  declare function max<A>(a: A, b: A, ...rest: Array<void>): A;
+  declare function max<A: Ord>(a: A, ...rest: Array<void>): Fn1<A, A>;
+  declare function max<A: Ord>(a: A, b: A, ...rest: Array<void>): A;
 
   //
   // Integer
